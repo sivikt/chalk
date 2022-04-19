@@ -1,0 +1,64 @@
+# Chalk language syntax examples
+# This file contains three different syntax examples
+
+
+# simple comment
+
+#!
+#  multiline comments
+!#
+
+String HELLO	= "Hello, new world!\n",
+	   FIRST	= "First example it is a simple math expression: ",
+	   SECOND 	= "Second example it is a computation of the integral: ",
+	   THIRD 	= "Third example it is a fibbonachi numbers (input any integer value): "
+
+Float GLOBAL_VAR = 5.7
+
+# calculating the numbers of fibbonachi
+def fibbonachi( Int value ): Int = 
+    Int count,
+    	a1, 
+    	a2 = 1,
+    	a3 = 1
+
+    while true
+        if count == n || n < 0
+	    break
+        else
+	    a3 = a1 + a2
+	    a1 = a2
+	    a2 = a3
+	    count++
+        end	
+    end
+
+    return a3
+end
+
+# a total number with count of members n
+def evalMathRow( Float a, Int n ): Float = 
+    # that macros definition is questionable 
+    # def macros Y(b,c) = c + b
+    # def macros Z(a,k) = a^k / k! + Y(k,k)
+    
+    Float store = 5
+
+    for i in [0:n]
+	Int j
+	for j in [n: n + 20]
+	  store += fibbonachi(i + j) + GLOBAL_VAR
+	end
+    end
+
+    return store
+end
+
+def entry main() =
+    print HELLO
+
+    print SECOND
+    println evalMathRow()
+    
+    println "Bye..."
+end

@@ -1,0 +1,427 @@
+grammar ChalkSyntax;
+
+options { 
+	backtrack = true;
+	memoize = true;
+}
+
+@header {
+  package chalk;
+}
+
+@lexer::header {
+  package chalk;
+}
+
+compiled_unit
+	:	( var_declaration 
+		| func_definition
+		)+
+  	;
+  
+var_declaration
+	:	type var_declarator ( ',' var_declarator )*
+	;
+
+var_declarator
+	: 	ID ( '=' logic_expr )? 
+	;
+
+func_definition
+	: 	DEF_TK ( ENTRY_TK )? ID 
+		LPAREN ( var_args_list )?  RPAREN ( ':' type )? '=' stmt_block
+	;
+
+var_args_list
+	: 	type ID ( ',' type ID )*
+	;
+
+stmt_block
+	: 	stmt* END_TK
+	;
+  
+stmt
+	: 	print_stmt
+	| 	var_declaration
+	| 	assigment_stmt
+	| 	selection_stmt
+	| 	iteration_stmt
+	| 	jump_stmt
+	;
+  
+print_stmt
+	: 	'print' logic_expr ( ',' logic_expr )*
+	|	'println' ( logic_expr ( ',' logic_expr )* )?
+	;
+    
+assigment_stmt
+	: 	( ID 	
+			( 	EQ
+			| 	STAR_EQ
+			|   RSLASH_EQ
+			|   PLUS_EQ
+			|   MINUS_EQ
+			| 	GT_GT_EQ
+			| 	LT_LT_EQ
+			) 
+		)? logic_expr
+	;
+    
+selection_stmt
+	: 	IF_TK logic_expr stmt+ 
+	  	( ELSIF_TK logic_expr stmt+ )* 
+	  	( ELSE_TK stmt+ )? 
+	  	END_TK
+	;
+
+iteration_stmt
+	: 	WHILE_TK logic_expr stmt_block
+	| 	DO_TK stmt* UNTIL_TK logic_expr
+	| 	FOR_TK ID IN_TK LBRACKET logic_expr ':' logic_expr RBRACKET stmt_block
+	; 
+  
+jump_stmt
+	: 	BREAK_TK
+	| 	CONTINUE_TK
+	| 	RETURN_TK ( logic_expr )?
+	;
+	
+logic_expr
+	: 	and_logic_expr ( BAR_BAR and_logic_expr )* 
+	;
+	    
+and_logic_expr
+	: 	comparison_expr ( AMP_AMP comparison_expr )*
+	;   
+  
+comparison_expr
+	: 	math_expr
+		(
+			( 	GT
+			| 	LT
+			| 	LT_EQ
+			| 	GT_EQ
+			| 	EQ_EQ
+			|	SCREAMER_EQ
+			)	
+			math_expr 
+		)* 
+	;
+  
+math_expr
+	: 	xor_math_expr ( BAR xor_math_expr )*
+	;
+  
+xor_math_expr
+	: 	and_math_expr ( CARET and_math_expr )* 
+	;
+
+and_math_expr
+	: 	shift_math_expr ( AMP shift_math_expr )*
+	;
+
+shift_math_expr
+	:   additive_math_expr
+		( 
+			(	LT_LT 
+			|	GT_GT 
+			) 
+			additive_math_expr
+		)* 
+	;
+
+additive_math_expr
+	: 	multiplicative_math_expr 
+		( 
+			(	PLUS
+			|	MINUS
+			) 
+			multiplicative_math_expr
+		)*
+	;
+
+multiplicative_math_expr 
+	: 	unary_math_expr
+	( 
+		(	STAR 
+		| 	RSLASH 
+		| 	MOD
+		| 	DIV 
+		) 
+		unary_math_expr
+	)* 
+	;
+
+unary_math_expr
+	:	type ':' unary_math_expr
+	|	(	PLUS
+		|	MINUS
+		|	TILDE 
+		|	SCREAMER
+		) unary_math_expr
+	|	primary_math_expr
+        (   SCREAMER
+        |	PLUS_PLUS
+        |	MINUS_MINUS
+        |	STAR_STAR unary_math_expr
+        )?
+	;
+
+primary_math_expr
+	: 	LPAREN logic_expr RPAREN
+	| 	'read' ID ( ',' ID )*
+	|	(	PLUS_PLUS 
+		|	MINUS_MINUS 
+		) ID 
+	|	ID LPAREN ( logic_expr (',' logic_expr )* )? RPAREN
+	| 	ID
+	| 	literal			
+	| 	constants		
+	| 	math_lib_funcs
+	;
+
+constants
+	: 	'CONST' '.' 
+		( 	'pi'			
+		| 	'e'			 
+		)
+	|	'Float' '.'	
+		(	'MAX_VALUE'		
+		|	'MIN_VALUE'			
+		|	'NEGATIVE_INFINITY'	
+		|	'POSITIVE_INFINITY'	
+		|	'NaN'				
+		)
+	|	'Int' '.'
+		(	'MAX_VALUE' 		
+		|	'MIN_VALUE'
+		)
+	;
+
+math_lib_funcs
+	: 	'sin' LPAREN logic_expr RPAREN
+	| 	'cos' LPAREN logic_expr RPAREN 
+	| 	'tan' LPAREN logic_expr RPAREN
+	| 	'asin' LPAREN logic_expr RPAREN
+	| 	'acos' LPAREN logic_expr RPAREN
+	| 	'atan' LPAREN logic_expr RPAREN
+	| 	'lg' LPAREN logic_expr RPAREN
+	| 	'ln' LPAREN logic_expr RPAREN
+	| 	'sqrt' LPAREN logic_expr RPAREN	
+	| 	(	'max'
+		| 	'min'
+		) LPAREN logic_expr ( ',' logic_expr )+ RPAREN
+	| 	'swaps' LPAREN ID ',' ID RPAREN
+	|	'swapv' LPAREN ID ',' ID RPAREN
+	| 	'log' LPAREN logic_expr ',' logic_expr RPAREN
+	;
+
+type
+	:   'Int'	
+	| 	'Float'
+	|	'String'
+	| 	'Bool'
+	;
+
+literal
+	:   DECIMAL_LITERAL
+	|   FLOATING_POINT_LITERAL
+	|	STRING_LITERAL	
+	|   TRUE
+	|	FALSE
+	; 
+
+FALSE
+	:	'false';
+
+TRUE
+	:	'true';	
+
+DEF_TK
+	:	'def';	
+	
+ENTRY_TK
+	:	'entry';	
+	
+END_TK
+	:	'end';	
+	
+IF_TK
+	:	'if';	
+	
+ELSIF_TK
+	:	'elsif';		
+
+ELSE_TK
+	:	'else';	
+
+WHILE_TK
+	:	'while';	
+	
+DO_TK
+	:	'do';	
+	
+UNTIL_TK
+	:	'until';
+	
+FOR_TK
+	:	'for';	
+
+IN_TK
+	:	'in';
+
+BREAK_TK
+	:	'break';	
+	
+CONTINUE_TK
+	:	'continue';	
+	
+RETURN_TK
+	:	'return';
+	
+EXIT_TK
+	:	'exit';	
+
+PLUS
+	:	'+';
+	
+PLUS_PLUS
+	:	'++';
+	
+MINUS
+	:	'-';	
+	
+MINUS_MINUS
+	:	'--';	
+
+TILDE 
+	:	'~';
+	
+SCREAMER
+	:	'!';	
+	
+STAR
+	:	'*';	
+
+STAR_STAR
+	:	'**';
+	
+RSLASH
+	:	'/';	
+	
+DIV
+	:	'div';		
+
+MOD
+	:	'mod';	
+	
+GT
+    :   '>';
+  
+GT_GT
+    :   '>>';   
+    
+GT_GT_EQ
+    :   '>>=';    
+    
+LT
+    :   '<';
+  
+LT_LT
+    :   '<<'; 
+    
+LT_LT_EQ
+    :   '<<=';       
+    
+LT_EQ
+    :   '<=';
+  
+GT_EQ
+    :   '>=';       		
+
+EQ
+	:	'=';
+
+EQ_EQ
+	:	'==';	
+
+SCREAMER_EQ
+	:	'!=';
+	
+PLUS_EQ
+	:	'+=';
+
+MINUS_EQ
+	:	'-=';
+	
+STAR_EQ
+	:	'*=';		
+	
+RSLASH_EQ
+	:	'/=';
+	
+BAR
+	:	'|';
+	
+BAR_BAR
+	:	'||';		
+	
+AMP
+	:	'&';
+	
+AMP_AMP
+	:	'&&';
+	
+CARET
+    :   '^';
+    
+LPAREN
+    :   '(';
+
+RPAREN
+    :   ')';
+
+LBRACE
+    :   '{';
+
+RBRACE
+    :   '}';
+
+LBRACKET
+    :   '[';
+
+RBRACKET
+    :   ']';    			
+
+ID  
+	: 	( 'a'..'z' | 'A'..'Z' | '_' ) ( 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' )*
+	;
+
+STRING_LITERAL 
+	:	'"' ( ~( '"' | '\n' | '\r' ) )* '"'
+	;
+
+DECIMAL_LITERAL 
+	:   '0' 
+	| 	'1'..'9' ( '0'..'9' )*
+	;
+  
+FLOATING_POINT_LITERAL
+	:	('0' .. '9')+ '.' ('0' .. '9')* Exponent? 
+    |	'.'	('0' .. '9')+ Exponent?  
+   	|	('0' .. '9')+ 
+	;
+
+fragment
+Exponent
+	: 	( 'e' | 'E' ) ( '+' | '-' )? ('0'..'9')+ 
+	;
+
+COMMENT
+	:	'#' ~( '\n' | '\r' )* '\r'? '\n' { $channel = HIDDEN; }
+	| 	'#!' ( options { greedy = false; } : . )* '!#' { $channel = HIDDEN; }
+	;
+
+WHITESPACE
+	: 	( ' ' | '\t' | '\r' | '\n' ) { $channel = HIDDEN; }
+	;

@@ -1,0 +1,475 @@
+group Java;
+
+compiled_unit(programName, globalVars, functions) ::= <<
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+class ChalkLib {
+	private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+	
+	public static void print( Object... args )
+	{
+		for ( int i = 0; i \< args.length; i++ )
+			{
+				System.out.print(args[i]);
+			}
+		}
+		
+		public static void println( Object... args )
+		{
+			for ( int i = 0; i \< args.length; i++ )
+			{
+				System.out.print(args[i]);
+			}
+			System.out.println();
+		}
+
+		public static int float2Int( Double arg )
+		{
+			return arg.intValue();
+		}
+		
+		public static double int2Float( Integer arg )
+		{
+			return arg.doubleValue();
+		}
+		
+		public static int factorial( Integer arg )
+		{
+			if (arg \<= 0)
+				return 1;
+			else 
+				return arg * factorial(arg - 1);
+		}	
+		
+		public static int invAbs( Integer arg )
+		{
+			if (arg \<= 0)
+				return arg;
+			else
+				return -arg;
+		}
+		
+		public static double invAbs( Double arg )
+		{
+			if (arg \<= 0)
+				return arg;
+			else
+				return -arg;
+		}		
+		
+		public static int maxI( Integer... args ) 
+		{
+			Integer max = args[0];
+			for ( int i = 1; i \< args.length; i++ ) {
+				if (args[i] \> max)
+					max = args[i];
+			}
+			
+			return max;
+		}
+	
+		public static double maxF( Double... args ) 
+		{
+			Double max = args[0];
+			for ( int i = 1; i \< args.length; i++ ) {
+				if (args[i] \> max)
+					max = args[i];
+			}
+			
+			return max;
+		}	
+
+		public static int minI( Integer... args ) 
+		{
+			Integer min = args[0];
+			for ( int i = 1; i \< args.length; i++ ) {
+				if (args[i] \< min)
+					min = args[i];
+			}
+			
+			return min;
+		}
+		
+		public static double minF( Double... args ) 
+		{
+			Double min = args[0];
+			for ( int i = 1; i \< args.length; i++ ) {
+				if (args[i] \< min)
+					min = args[i];
+			}
+			
+			return min;
+		}
+		
+		public static Object read(Object o)
+		{
+			try {
+				if (o instanceof Integer)
+				{
+					o = new Integer(reader.readLine());
+					return new Integer(((Integer)o).intValue());
+				}
+				else if (o instanceof Double)
+				{
+					o = new Double(reader.readLine());
+					return new Double(((Double)o).doubleValue());
+				}
+				else if (o instanceof String)
+				{
+					o = reader.readLine();
+					return new String((String)o);
+				}
+				else if (o instanceof Boolean)
+				{
+					o = new Boolean(reader.readLine());
+					return new Boolean(((Boolean)o).booleanValue());
+				}
+				
+				return null;
+			} catch (NumberFormatException e) {
+				return null;
+			} catch (IOException e) {
+				return null;
+			}	
+		}
+		
+		public static String read()
+		{
+			try {
+				return reader.readLine();
+			} catch (NumberFormatException e) {
+				return null;
+			} catch (IOException e) {
+				return null;
+			}	
+		}	
+		
+		public static Integer readInteger()
+		{
+			try {
+				return Integer.parseInt(reader.readLine());
+			} catch (NumberFormatException e) {
+				return null;
+			} catch (IOException e) {
+				return null;
+			}	
+		}
+		
+		public static Double readDouble()
+		{
+			try {
+				return Double.parseDouble(reader.readLine());
+			} catch (NumberFormatException e) {
+				return null;
+			} catch (IOException e) {
+				return null;
+			}	
+		}
+		
+		public static Boolean readBoolean()
+		{
+			try {
+				return Boolean.parseBoolean(reader.readLine());
+			} catch (NumberFormatException e) {
+				return null;
+			} catch (IOException e) {
+				return null;
+			}	
+		}
+		
+		public static String readString()
+		{
+			try {
+				return reader.readLine();
+			} catch (NumberFormatException e) {
+				return null;
+			} catch (IOException e) {
+				return null;
+			}	
+		}							
+	}	
+
+public class <programName> {	
+	<globalVars; separator="\n">
+	
+    <functions; separator="\n\n">
+}
+>>
+
+func_definition(name, args, type, stmts) ::= <<
+public static <type> <name>(<args>) {
+    <stmts; separator="\n">
+}
+>>
+
+main_func_definition(stmts) ::= <<
+public static void main(String[] args) {
+    <stmts; separator="\n">
+}
+>>
+
+stmt_list(stmts) ::= <<
+<stmts; separator="\n">
+>>
+
+var_args_list(args) ::= <<
+<args; separator=", ">
+>>
+
+var_arg(type, id) ::= "<type> <id>"
+
+print_stmt(args) ::= <<
+ChalkLib.print(<args; separator=", ">);
+>>
+
+println_stmt(args) ::= <<
+ChalkLib.println(<args; separator=", ">);
+>>
+
+if_stmt(test, stmts, alts) ::= <<
+if (<test>) {
+	<stmts; separator="\n">
+} <alts; separator=" ">
+>>
+
+elsif_stmt(test, stmts) ::= <<
+else if (<test>) {
+	<stmts; separator="\n">
+}
+>>
+
+else_stmt(stmts) ::= <<
+else {
+	<stmts; separator="\n">
+}
+>>
+
+while_stmt(test, stmts) ::= <<
+while (<test>) {
+	<stmts; separator="\n">
+}
+>>
+
+until_stmt(test, stmts) ::= <<
+do {
+	<stmts; separator="\n">
+} while (<test>);
+>>
+
+for_stmt(stmts, id, op1, op2) ::= <<
+for (<id> = <op1>; <id> \<= <op2>; <id>++) {
+	<stmts>
+}	
+>>
+
+break_stmt() ::= "break;"
+
+continue_stmt() ::= "continue;"
+
+return_stmt(arg) ::= "return <arg>;"
+
+func_call(name, args) ::= <<
+<name>(<args; separator=", ">)
+>>
+
+read_int() ::= "ChalkLib.readInteger()"
+
+read_float() ::= "ChalkLib.readDobule()"
+
+read_string() ::= "ChalkLib.readString()"
+
+read_bool() ::= "ChalkLib.readBool()"
+
+global_var_declaration(type, declarators) ::= <<
+static <type> <declarators; separator=", ">;
+>>	
+
+var_declaration(type, declarators) ::= <<
+<type> <declarators; separator=", ">;
+>>	
+
+var_declarator(id, init) ::= "<id> = <init>"
+
+assg_var_declarator(id, value) ::= "<id> = <value>"
+
+assigment_stmt(op1) ::= "<op1>;"
+
+assigment_stmt_eq(op1, op2) ::= "<op1> = <op2>;"
+
+assigment_stmt_stareq(op1, op2) ::= "<op1> *= <op2>;"
+
+assigment_stmt_pluseq(op1, op2) ::= "<op1> += <op2>;"
+
+assigment_stmt_minuseq(op1, op2) ::= "<op1> -= <op2>;"
+
+assigment_stmt_slasheq(op1, op2) ::= "<op1> /= <op2>;"
+
+assigment_stmt_gtgteq(op1, op2) ::= "<op1> \>\>= <op2>;"
+
+assigment_stmt_ltlteq(op1, op2) ::= "<op1> \<\<= <op2>;"
+
+logic_expr(op1, op2) ::= "<op1> || <op2>"
+
+and_logic_expr(op1, op2) ::= "<op1> && <op2>"
+
+comparison_expr_gt(op1, op2) ::= "<op1> \> <op2>"
+
+comparison_expr_lt(op1, op2) ::= "<op1> \< <op2>"
+
+comparison_expr_lteq(op1, op2) ::= "<op1> \<= <op2>"
+
+comparison_expr_gteq(op1, op2) ::= "<op1> \>= <op2>"
+
+comparison_expr_eqeq(op1, op2) ::= "<op1> == <op2>"
+
+comparison_expr_noteq(op1, op2) ::= "<op1> != <op2>"
+
+math_expr(op1, op2) ::= "<op1> | <op2>"
+
+xor_math_expr(op1, op2) ::= "<op1> ^ <op2>"
+
+and_math_expr(op1, op2) ::= "<op1> & <op2>"
+
+shift_math_expr_gtgt(op1, op2) ::= "<op1> \>\> <op2>"
+
+shift_math_expr_ltlt(op1, op2) ::= "<op1> \<\< <op2>"
+
+additive_math_expr_p(op1, op2) ::= "<op1> + <op2>"
+
+additive_math_expr_m(op1, op2) ::= "<op1> - <op2>"
+
+multiplicative_math_expr_star(op1, op2) ::= "<op1> * <op2>"
+
+multiplicative_math_expr_slash(op1, op2) ::= "<op1> / <op2>"
+
+multiplicative_math_expr_mod(op1, op2) ::= "<op1> % <op2>"
+
+multiplicative_math_expr_div(op1, op2) ::= "<op1> / <op2>"
+
+type_cast_int2float(op1) ::= "ChalkLib.int2Float(<op1>)"
+
+type_cast_float2int(op1) ::= "ChalkLib.float2Int(<op1>)"
+
+type_cast_eq2eq(op1) ::= "<op1>"
+
+plus_unary_math_expr(op1) ::= "Math.abs(<op1>)"
+
+minus_unary_math_expr(op1) ::= "ChalkLib.invAbs(<op1>)"
+
+tilde_unary_math_expr(op1) ::= "~<op1>"
+
+scream_unary_math_expr(op1) ::= "!<op1>"
+
+primary_math_expr_scream(op1) ::= "ChalkLib.factorial(<op1>)"
+
+primary_math_expr_plusplus(op1) ::= "<op1>++"
+
+primary_math_expr_minusminus(op1) ::= "<op1>--"
+
+primary_math_expr_power(op1, op2) ::= "Math.pow(<op1>, <op2>)"
+
+primary_math_expr_id(id) ::= "<id>"
+
+literal(lit) ::= "<lit>"
+
+sin(arg) ::= "Math.sin(<arg>)"
+
+cos(arg) ::= "Math.cos(<arg>)"
+
+tan(arg) ::= "Math.tan(<arg>)"
+
+asin(arg) ::= "Math.asin(<arg>)"
+
+acos(arg) ::= "Math.acos(<arg>)"
+
+atan(arg) ::= "Math.atan(<arg>)"
+
+lg(arg) ::= "Math.log10(<arg>)"
+
+ln(arg) ::= "Math.log(<arg>)"
+
+sqrt(arg) ::= "Math.sqrt(<arg>)"
+
+max_int(args) ::= <<
+ChalkLib.maxI(<args; separator=", ">)
+>>
+
+max_float(args) ::= <<
+ChalkLib.maxF(<args; separator=", ">)
+>>
+
+min_int(args) ::= <<
+ChalkLib.minI(<args; separator=", ">)
+>>
+
+min_float(args) ::= <<
+ChalkLib.minF(<args; separator=", ">)
+>>
+
+swaps(op1, op2) ::= <<
+if (<op1> \< 0 && <op2> \> 0) {
+	<op2> = -<op2>;
+	<op1> = Math.abs(<op1>);
+} else if (<op1> \> 0 && <op2> \< 0) {
+	<op1> = -<op1>;
+	<op2> = Math.abs(<op2>);		
+}
+>>
+
+swapv(arg1, arg2, castType) ::= <<
+Object tmp = <arg1>;
+<arg1> = <arg2>;
+<arg2> = (<castType>)tmp
+>>
+
+log(arg1, arg2) ::= "(Math.log(<arg2>)/Math.log(<arg1>))"
+
+const_pi() ::= "Math.PI"
+
+const_e() ::= "Math.E"
+
+float_max() ::= "Double.MAX_VALUE"
+
+float_min() ::= "Double.MIN_VALUE"
+
+float_ni() ::= "Double.NEGATIVE_INFINITY"
+
+float_pi() ::= "Double.POSITIVE_INFINITY"
+
+float_nan() ::= "Double.NaN"
+
+int_max() ::= "Integer.MAX_VALUE"
+
+int_min() ::= "Integer.MIN_VALUE"
+
+plusplus_id(op1) ::= "++<op1>"
+
+minusminus_id(op1) ::= "--<op1>"
+
+primary_math_expr_parens(op1) ::= "(<op1>)"
+
+type_int() ::= "int"
+
+type_float() ::= "double"
+
+type_bool() ::= "boolean"
+
+type_string() ::= "String"
+
+type_void() ::= "void"
+
+cast_type_str() ::= "String"
+
+cast_type_int() ::= "Integer"
+
+cast_type_float() ::= "Double"
+
+cast_type_bool() ::= "Boolean"
+
+empty_template() ::= ""
+
+get_int_value(op) ::= "(<op>).intValue()"
+
+get_float_value(op) ::= "(<op>).doubleValue()"

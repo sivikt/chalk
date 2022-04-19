@@ -1,0 +1,29 @@
+# Chalk language syntax examples
+
+String HELLO	= "Hello, new world!\n",
+       FIRST	= "First example it is a simple math expression: "
+
+Float GLOBAL_VAR = 5.7
+
+# a function representation
+# math expression
+def mathExpr( Int a, Int b, Int c ): Float = 
+    if (a > b && b < c)
+	return sin(a) + a! - b**c + asin(a) + GLOBAL_VAR
+    elsif b != c
+	Int sum
+	for v in [b:c]
+	    sum += v
+	end
+	return +(sum/b) + log(a, c) + ln(CONST.pi) - 1.4E+2
+    else
+	return max(a, b, c) * min(a, b, c) ##+ { swaps(a, b); b mod +a }
+    end
+end
+
+def entry main() =
+    print HELLO
+
+    print FIRST
+    println mathExpr(1, 2)
+end
